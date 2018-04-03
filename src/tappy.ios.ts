@@ -140,7 +140,9 @@ export class Tappy extends Common {
             console.log("Found tappy:");
             console.log(JSON.stringify(tappyDevice));
             let name = tappyDevice.name();
-            console.log("!!Name:", name);
+            let deviceId = tappyDevice.deviceId;
+            console.log("Name:", name);
+            console.log("Device id:", tappyDevice.deviceId);
             this.device = tappyDevice;
             const tappyFoundEvent = {
                 eventName: "tappyFound",
