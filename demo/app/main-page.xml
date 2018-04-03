@@ -2,5 +2,13 @@
   xmlns:ui="nativescript-tappy">
   <StackLayout class="p-20">
     <Label text="{{ message }}" class="t-20 text-center c-black" textWrap="true"/>
+    <Button text="Scan" tap="{{ startScan }}" visibility="{{ canScan ? 'visible' : 'collapsed' }}"/>
+    <Button text="Stop Scan" tap="{{ stopScan }}" visibility="{{ isScanning ? 'visible' : 'collapsed' }}"/>
+    <Button text="Connect" tap="{{ connectTappy }}" visibility="{{ canConnect && !isConnected ? 'visible' : 'collapsed' }}"/>
+    <Button text="Disconnect" tap="{{ disconnectTappy }}" visibility="{{ isConnected ? 'visible' : 'collapsed' }}"/>
+
+
+    <Button text="Test R/W" tap="{{ testRW }}" visibility="{{ isConnected ? 'visible' : 'collapsed' }}" />
+
   </StackLayout>
 </Page>
