@@ -14,6 +14,19 @@ export class Common extends Observable {
 
   }
 
+  public scan() {
+
+  }
+
+
+  public readWristband() {
+
+  }
+
+  public writeWristband() {
+
+  }
+
   public greet() {
     return "Hello, NS";
   }
