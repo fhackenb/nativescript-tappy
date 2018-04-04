@@ -132,6 +132,10 @@ declare class ScanNDEFCommand extends NSObject implements TCMPMessage {
 
 	readonly payload: NSArray<number>; // inherited from TCMPMessage
 
+	constructor(o: { timeout: number; pollingMode: PollingMode; });
+
+	initWithTimeoutPollingMode(timeout: number, pollingMode: PollingMode): this;
+
 	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
 
@@ -141,13 +145,21 @@ declare class SerialTappy extends NSObject {
 
 	static new(): SerialTappy; // inherited from NSObject
 
+	constructor(o: { communicator: TappySerialCommunicator; });
+
 	close(): void;
 
 	connect(): void;
 
 	disconnect(): void;
 
+	getCommunicator(): TappySerialCommunicator;
+
 	getDeviceDescription(): string;
+
+	getLatestStatus(): TappyStatus;
+
+	initWithCommunicator(communicator: TappySerialCommunicator): this;
 
 	receiveBytesWithData(data: NSArray<number>): void;
 
@@ -162,6 +174,8 @@ declare class SerialTappy extends NSObject {
 	sendMessageWithMessage(message: TCMPMessage): void;
 
 	setResponseListenerWithListener(listener: (p1: TCMPMessage) => void): void;
+
+	setStatusListenerWithListner(listner: (p1: TappyStatus) => void): void;
 
 	setUnparsablePacketListenerWithListener(listener: (p1: NSArray<number>) => void): void;
 }
@@ -183,6 +197,10 @@ declare class StreamNDEFCommand extends NSObject implements TCMPMessage {
 	readonly commandFamily: NSArray<number>; // inherited from TCMPMessage
 
 	readonly payload: NSArray<number>; // inherited from TCMPMessage
+
+	constructor(o: { timeout: number; pollingMode: PollingMode; });
+
+	initWithTimeoutPollingMode(timeout: number, pollingMode: PollingMode): this;
 
 	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
@@ -293,6 +311,10 @@ declare class TagWrittenResponse extends NSObject implements TCMPMessage {
 
 	readonly payload: NSArray<number>; // inherited from TCMPMessage
 
+	constructor(o: { tagCode: NSArray<number>; tagType: TagTypes; });
+
+	initWithTagCodeTagType(tagCode: NSArray<number>, tagType: TagTypes): this;
+
 	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
 
@@ -305,6 +327,53 @@ declare class TappyBle extends SerialTappy {
 	static new(): TappyBle; // inherited from NSObject
 }
 
+declare class TappyBleCommunicator extends NSObject {
+
+	static alloc(): TappyBleCommunicator; // inherited from NSObject
+
+	static getTappyBleCommunicatorWithCentralManagerDeviceId(centralManager: CBCentralManager, deviceId: NSUUID): TappyBleCommunicator;
+
+	static new(): TappyBleCommunicator; // inherited from NSObject
+
+	error: NSError;
+
+	readonly state: TappyStatus;
+
+	centralManagerDidConnectPeripheral(central: CBCentralManager, peripheral: CBPeripheral): void;
+
+	centralManagerDidDisconnectPeripheralError(central: CBCentralManager, peripheral: CBPeripheral, error: NSError): void;
+
+	centralManagerDidFailToConnectPeripheralError(central: CBCentralManager, peripheral: CBPeripheral, error: NSError): void;
+
+	centralManagerDidUpdateState(central: CBCentralManager): void;
+
+	close(): void;
+
+	connect(): void;
+
+	disconnect(): void;
+
+	getDeviceDescription(): string;
+
+	peripheralDidDiscoverCharacteristicsForServiceError(peripheral: CBPeripheral, service: CBService, error: NSError): void;
+
+	peripheralDidDiscoverServices(peripheral: CBPeripheral, error: NSError): void;
+
+	peripheralDidUpdateValueForCharacteristicError(peripheral: CBPeripheral, characteristic: CBCharacteristic, error: NSError): void;
+
+	peripheralDidWriteValueForCharacteristicError(peripheral: CBPeripheral, characteristic: CBCharacteristic, error: NSError): void;
+
+	removeDataListener(): void;
+
+	removeStatusListener(): void;
+
+	sendBytesWithData(data: NSArray<number>): void;
+
+	setDataListenerWithReceivedBytes(listener: (p1: NSArray<number>) => void): void;
+
+	setStatusListenerWithStatusReceived(listener: (p1: TappyStatus) => void): void;
+}
+
 declare class TappyBleDevice extends NSObject {
 
 	static alloc(): TappyBleDevice; // inherited from NSObject
@@ -312,6 +381,8 @@ declare class TappyBleDevice extends NSObject {
 	static new(): TappyBleDevice; // inherited from NSObject
 
 	deviceId: NSUUID;
+
+	deviceName: string;
 
 	name(): string;
 }
@@ -337,6 +408,14 @@ declare class TappyBleScanner extends NSObject {
 
 	static new(): TappyBleScanner; // inherited from NSObject
 
+	centralManager: CBCentralManager;
+
+	state: TappyBleScannerStatus;
+
+	statusListener: (p1: TappyBleScannerStatus) => void;
+
+	tappyFoundListener: (p1: TappyBleDevice, p2: string) => void;
+
 	constructor(o: { centralManager: CBCentralManager; });
 
 	centralManagerDidDiscoverPeripheralAdvertisementDataRSSI(central: CBCentralManager, peripheral: CBPeripheral, advertisementData: NSDictionary<string, any>, RSSI: number): void;
@@ -351,7 +430,7 @@ declare class TappyBleScanner extends NSObject {
 
 	setStatusListenerWithStatusReceived(listener: (p1: TappyBleScannerStatus) => void): void;
 
-	setTappyFoundListenerWithListener(listener: (p1: TappyBleDevice) => void): void;
+	setTappyFoundListenerWithListener(listener: (p1: TappyBleDevice, p2: string) => void): void;
 
 	startScan(): boolean;
 
@@ -387,6 +466,33 @@ declare class TappyCentralManagerProvider extends NSObject {
 
 	centralManager: CBCentralManager;
 }
+
+interface TappySerialCommunicator {
+
+	state: TappyStatus;
+
+	close(): void;
+
+	connect(): void;
+
+	disconnect(): void;
+
+	getDeviceDescription(): string;
+
+	removeDataListener(): void;
+
+	removeStatusListener(): void;
+
+	sendBytesWithData(data: NSArray<number>): void;
+
+	setDataListenerWithReceivedBytes(listener: (p1: NSArray<number>) => void): void;
+
+	setStatusListenerWithStatusReceived(listener: (p1: TappyStatus) => void): void;
+}
+declare var TappySerialCommunicator: {
+
+	prototype: TappySerialCommunicator;
+};
 
 declare const enum TappyStatus {
 
@@ -424,6 +530,10 @@ declare class WriteNDEFTextCommand extends NSObject implements TCMPMessage {
 	readonly commandFamily: NSArray<number>; // inherited from TCMPMessage
 
 	readonly payload: NSArray<number>; // inherited from TCMPMessage
+
+	constructor(o: { timeout: number; lockTag: LockingMode; text: string; });
+
+	initWithTimeoutLockTagText(timeout: number, lockTag: LockingMode, text: string): this;
 
 	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
