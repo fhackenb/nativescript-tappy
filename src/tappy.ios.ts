@@ -1,17 +1,91 @@
 import { Common } from './tappy.common';
 
+
+
+
 // definitions
-export interface TappySerialCommunicator {
-	state: TappyStatus;
-	close(): void;
-	connect(): void;
-	disconnect(): void;
-	getDeviceDescription(): string;
-	removeDataListener(): void;
-	removeStatusListener(): void;
-	sendBytesWithData(data: NSArray<number>): void;
-	setDataListenerWithReceivedBytes(listener: (p1: NSArray<number>) => void): void;
-	setStatusListenerWithStatusReceived(listener: (p1: TappyStatus) => void): void;
+
+
+export declare class BasicNFCCommandResolver extends NSObject {
+	static alloc(): BasicNFCCommandResolver; // inherited from NSObject
+	static new(): BasicNFCCommandResolver; // inherited from NSObject
+	public FAMILY_ID: NSArray<number>;
+	resolveCommandWithMessageError(message: TCMPMessage): TCMPMessage;
+	resolveResponseWithMessageError(message: TCMPMessage): TCMPMessage;
+}
+
+export declare class BasicNfcApplicationErrorMessage extends NSObject implements TCMPMessage {
+	static alloc(): BasicNfcApplicationErrorMessage; // inherited from NSObject
+	static new(): BasicNfcApplicationErrorMessage; // inherited from NSObject
+	public appErrorCode: number;
+	public errorDescription: string;
+	public internalErrorCode: number;
+	public readerStatusCode: number;
+	public commandCode: number; // inherited from TCMPMessage
+	public commandFamily: NSArray<number>; // inherited from TCMPMessage
+	public payload: NSArray<number>; // inherited from TCMPMessage
+	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
+}
+
+export declare class HDLCParseResult extends NSObject {
+	static alloc(): HDLCParseResult; // inherited from NSObject
+	static new(): HDLCParseResult; // inherited from NSObject
+	constructor(o: { bytes: NSArray<number>; packets: NSArray<NSArray<number>>; remainder: NSArray<number>; });
+	getBytes(): NSArray<number>;
+	getPackets(): NSArray<NSArray<number>>;
+	getRemainder(): NSArray<number>;
+	initWithBytesPacketsRemainder(bytes: NSArray<number>, packets: NSArray<NSArray<number>>, remainder: NSArray<number>): this;
+}
+
+export declare const enum LockingMode {
+	DONT_LOCK_TAG = 0,
+	LOCK_TAG = 1
+}
+
+export declare class NDEFFoundResponse extends NSObject implements TCMPMessage {
+	static alloc(): NDEFFoundResponse; // inherited from NSObject
+	static new(): NDEFFoundResponse; // inherited from NSObject
+	public ndefMessage: NSArray<number>;
+	public tagCode: NSArray<number>;
+	public tagType: TagTypes;
+	public commandCode: number; // inherited from TCMPMessage
+	public commandFamily: NSArray<number>; // inherited from TCMPMessage
+	public payload: NSArray<number>; // inherited from TCMPMessage
+	constructor(o: { tagCode: NSArray<number>; tagType: number; ndefMessage: NSArray<number>; });
+	initWithTagCodeTagTypeNdefMessage(tagCode: NSArray<number>, tagType: number, ndefMessage: NSArray<number>): this;
+	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
+}
+
+export declare const enum PollingMode {
+	PollForType1 = 1,
+	PollForGeneral = 2
+}
+
+export declare class RawTCMPMesssage extends NSObject implements TCMPMessage {
+	static alloc(): RawTCMPMesssage; // inherited from NSObject
+	static new(): RawTCMPMesssage; // inherited from NSObject
+	public commandCode: number; // inherited from TCMPMessage
+	public commandFamily: NSArray<number>; // inherited from TCMPMessage
+	public payload: NSArray<number>; // inherited from TCMPMessage
+	constructor(o: { commandCode: number; commandFamily: NSArray<number>; payload: NSArray<number>; });
+	constructor(o: { message: NSArray<number>; });
+	initWithCommandCodeCommandFamilyPayload(commandCode: number, commandFamily: NSArray<number>, payload: NSArray<number>): this;
+	initWithMessageError(message: NSArray<number>): this;
+	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
+}
+
+export declare class ScanNDEFCommand extends NSObject implements TCMPMessage {
+	static alloc(): ScanNDEFCommand; // inherited from NSObject
+	static getCommandCode(): number;
+	static new(): ScanNDEFCommand; // inherited from NSObject
+	public pollingMode: PollingMode;
+	public timeout: number;
+	public commandCode: number; // inherited from TCMPMessage
+	public commandFamily: NSArray<number>; // inherited from TCMPMessage
+	public payload: NSArray<number>; // inherited from TCMPMessage
+	constructor(o: { timeout: number; pollingMode: PollingMode; });
+	initWithTimeoutPollingMode(timeout: number, pollingMode: PollingMode): this;
+	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
 
 export declare class SerialTappy extends NSObject {
@@ -31,60 +105,61 @@ export declare class SerialTappy extends NSObject {
 	removeStatusListener(): void;
 	removeUnparsablePacketListener(): void;
 	sendMessageWithMessage(message: TCMPMessage): void;
-	setResponseListenerWithListener(listener: (p1: TCMPMessage) => void): void;
+	setResponseListenerWithListener(listener: (p1: TCMPMessage, p2: any) => void): void;
 	setStatusListenerWithListner(listner: (p1: TappyStatus) => void): void;
 	setUnparsablePacketListenerWithListener(listener: (p1: NSArray<number>) => void): void;
 }
 
-
-export declare class TappyBleScanner {
-    constructor(centralManager: CBCentralManager);
-    tappyFoundListener: (p1: TappyBleDevice) => void;
-    startScan(): boolean;
-    stopScan();
-    centralManagerDidUpdateState(centralManager: CBCentralManager);
-    setStatusListenerWithStatusReceived(statusReceived);
-    setTappyFoundListenerWithListener(listener);
-    public state;
+export declare class StreamNDEFCommand extends NSObject implements TCMPMessage {
+	static alloc(): StreamNDEFCommand; // inherited from NSObject
+	static getCommandCode(): number;
+	static new(): StreamNDEFCommand; // inherited from NSObject
+	public pollingMode: PollingMode;
+	public timeout: number;
+	public commandCode: number; // inherited from TCMPMessage
+	public commandFamily: NSArray<number>; // inherited from TCMPMessage
+	public payload: NSArray<number>; // inherited from TCMPMessage
+	constructor(o: { timeout: number; pollingMode: PollingMode; });
+	initWithTimeoutPollingMode(timeout: number, pollingMode: PollingMode): this;
+	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
 
-export declare class TappyBle extends SerialTappy{
-    static getTappyBleWithCentralManagerDevice(centralManager: CBCentralManager, device: TappyBleDevice): TappyBle;
-    connect();
-    disconnect();
+export declare class StopCommand extends NSObject implements TCMPMessage {
+	static alloc(): StopCommand; // inherited from NSObject
+	static getCommandCode(): number;
+	static new(): StopCommand; // inherited from NSObject
+	public commandCode: number; // inherited from TCMPMessage
+	public commandFamily: NSArray<number>; // inherited from TCMPMessage
+	public payload: NSArray<number>; // inherited from TCMPMessage
+	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
 
-export declare class TappyBleDevice extends NSObject{
-    public deviceId: NSUUID;
-    public deviceName: string;
-	public name(): string;
+export declare class TCMP extends NSObject {
+	static alloc(): TCMP; // inherited from NSObject
+	static new(): TCMP; // inherited from NSObject
 }
 
-export declare enum TappyBleScannerStatus {
-    STATUS_CLOSED = 1,
-    STATUS_SCANNING = 2,
-    STATUS_POWERED_OFF = 3,
-    STATUS_POWERED_ON = 4,
-    STATUS_RESETTING = 5,
-    STATUS_NOT_AUTHORIZED = 6,
-    STATUS_NOT_SUPPORTED = 7,
-    STATUS_UNKNOWN = 8
+export declare interface TCMPMessage {
+	commandCode: number;
+	commandFamily: NSArray<number>;
+	payload: NSArray<number>;
+	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
+export declare var TCMPMessage: {
+	prototype: TCMPMessage;
+};
 
-export declare enum LockingMode {
-	DONT_LOCK_TAG = 0,
-	LOCK_TAG = 1
-}
+export declare var TCMPTappyVersionNumber: number;
 
-export declare enum TappyStatus {
-	STATUS_DISCONNECTED = 1,
-	STATUS_CONNECTING = 2,
-	STATUS_READY = 3,
-	STATUS_DISCONNECTING = 4,
-	STATUS_CLOSED = 5,
-	STATUS_ERROR = 6,
-	STATUS_NOT_READY_TO_CONNECT = 7,
-	STATUS_COMMUNICATOR_ERROR = 8
+export declare var TCMPTappyVersionString: interop.Reference<number>;
+
+export declare class TCMPUtils extends NSObject {
+	static alloc(): TCMPUtils; // inherited from NSObject
+	static calculateCRCWithData(data: NSArray<number>): NSArray<number>;
+	static containsHdlcEndpointWithPacket(packet: NSArray<number>): boolean;
+	static hdlcDecodePacketWithFrameError(frame: NSArray<number>): NSArray<number>;
+	static hdlcEncodePacketWithPacket(packet: NSArray<number>): NSArray<number>;
+	static new(): TCMPUtils; // inherited from NSObject
 }
 
 export declare const enum TagTypes {
@@ -112,75 +187,6 @@ export declare const enum TagTypes {
 	TAG_TYPE_NOT_RECOGNIZED = 255
 }
 
-export declare const enum PollingMode {
-	PollForType1 = 1,
-	PollForGeneral = 2
-}
-
-export declare class TappyCentralManagerProvider {
-    public static shared(): TappyCentralManagerProvider;
-    public centralManager;
-}
-
-export declare interface TCMPMessage {
-	commandCode: number;
-	commandFamily: NSArray<number>;
-	payload: NSArray<number>;
-	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
-}
-export declare var TCMPMessage: {
-	prototype: TCMPMessage;
-};
-
-export declare class WriteNDEFTextCommand extends NSObject implements TCMPMessage {
-	static alloc(): WriteNDEFTextCommand; 
-	static new(): WriteNDEFTextCommand;
-	public lockFlag: LockingMode;
-	public text: NSArray<number>;
-	public timeout: number;
-	public commandCode: number;
-	public commandFamily: NSArray<number>;
-	public payload: NSArray<number>;
-	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
-}
-
-export declare class ScanNDEFCommand extends NSObject implements TCMPMessage {
-	static alloc(): ScanNDEFCommand;
-	static getCommandCode(): number;
-	static new(): ScanNDEFCommand;
-	public pollingMode: PollingMode;
-	public timeout: number;
-	public commandCode: number;
-	public commandFamily: NSArray<number>;
-	public payload: NSArray<number>;
-	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
-}
-
-export declare class StreamNDEFCommand extends NSObject implements TCMPMessage {
-	static alloc(): StreamNDEFCommand;
-	static getCommandCode(): number;
-	static new(): StreamNDEFCommand;
-	public pollingMode: PollingMode;
-	public timeout: number;
-	public commandCode: number;
-	public commandFamily: NSArray<number>;
-	public payload: NSArray<number>;
-	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
-}
-
-export declare class BasicNfcApplicationErrorMessage extends NSObject implements TCMPMessage {
-	static alloc(): BasicNfcApplicationErrorMessage;
-	static new(): BasicNfcApplicationErrorMessage;
-	public appErrorCode: number;
-	public errorDescription: string;
-	public internalErrorCode: number;
-	public readerStatusCode: number;
-	public commandCode: number;
-	public commandFamily: NSArray<number>;
-	public payload: NSArray<number>;
-	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
-}
-
 export declare class TagWrittenResponse extends NSObject implements TCMPMessage {
 	static alloc(): TagWrittenResponse; // inherited from NSObject
 	static getCommandCode(): number;
@@ -195,19 +201,132 @@ export declare class TagWrittenResponse extends NSObject implements TCMPMessage 
 	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
 
-export declare class NDEFFoundResponse extends NSObject implements TCMPMessage {
-	static alloc(): NDEFFoundResponse;
-	static new(): NDEFFoundResponse;
-	public ndefMessage: NSArray<number>;
-	public tagCode: NSArray<number>;
-	public tagType: TagTypes;
-	public commandCode: number;
-	public commandFamily: NSArray<number>;
-	public payload: NSArray<number>;
-	constructor(o: { tagCode: NSArray<number>; tagType: number; ndefMessage: NSArray<number>; });
-	initWithTagCodeTagTypeNdefMessage(tagCode: NSArray<number>, tagType: number, ndefMessage: NSArray<number>): this;
+export declare class TappyBle extends SerialTappy {
+	static alloc(): TappyBle; // inherited from NSObject
+	static getTappyBleWithCentralManagerDevice(centralManager: CBCentralManager, device: TappyBleDevice): TappyBle;
+	static new(): TappyBle; // inherited from NSObject
+}
+
+export declare class TappyBleCommunicator extends NSObject {
+	static alloc(): TappyBleCommunicator; // inherited from NSObject
+	static getTappyBleCommunicatorWithCentralManagerDeviceId(centralManager: CBCentralManager, deviceId: NSUUID): TappyBleCommunicator;
+	static new(): TappyBleCommunicator; // inherited from NSObject
+	error: NSError;
+	public state: TappyStatus;
+	centralManagerDidConnectPeripheral(central: CBCentralManager, peripheral: CBPeripheral): void;
+	centralManagerDidDisconnectPeripheralError(central: CBCentralManager, peripheral: CBPeripheral, error: NSError): void;
+	centralManagerDidFailToConnectPeripheralError(central: CBCentralManager, peripheral: CBPeripheral, error: NSError): void;
+	centralManagerDidUpdateState(central: CBCentralManager): void;
+	close(): void;
+	connect(): void;
+	disconnect(): void;
+	getDeviceDescription(): string;
+	peripheralDidDiscoverCharacteristicsForServiceError(peripheral: CBPeripheral, service: CBService, error: NSError): void;
+	peripheralDidDiscoverServices(peripheral: CBPeripheral, error: NSError): void;
+	peripheralDidUpdateValueForCharacteristicError(peripheral: CBPeripheral, characteristic: CBCharacteristic, error: NSError): void;
+	peripheralDidWriteValueForCharacteristicError(peripheral: CBPeripheral, characteristic: CBCharacteristic, error: NSError): void;
+	removeDataListener(): void;
+	removeStatusListener(): void;
+	sendBytesWithData(data: NSArray<number>): void;
+	setDataListenerWithReceivedBytes(listener: (p1: NSArray<number>) => void): void;
+	setStatusListenerWithStatusReceived(listener: (p1: TappyStatus) => void): void;
+}
+
+export declare class TappyBleDevice extends NSObject {
+	static alloc(): TappyBleDevice; // inherited from NSObject
+	static new(): TappyBleDevice; // inherited from NSObject
+	deviceId: NSUUID;
+	deviceName: string;
+	name(): string;
+}
+
+export declare class TappyBleDeviceDefinition extends NSObject {
+	static alloc(): TappyBleDeviceDefinition; // inherited from NSObject
+	static getRxCharacteristicUuid(): CBUUID;
+	static getSerialServiceUuid(): CBUUID;
+	static getTxCharacteristicUuid(): CBUUID;
+	static isTappyDeviceNameWithDevice(device: CBPeripheral): boolean;
+	static new(): TappyBleDeviceDefinition; // inherited from NSObject
+}
+
+export declare class TappyBleScanner extends NSObject {
+	static alloc(): TappyBleScanner; // inherited from NSObject
+	static new(): TappyBleScanner; // inherited from NSObject
+	centralManager: CBCentralManager;
+	state: TappyBleScannerStatus;
+	statusListener: (p1: TappyBleScannerStatus) => void;
+	tappyFoundListener: (p1: TappyBleDevice, p2: string) => void;
+	constructor(o: { centralManager: CBCentralManager; });
+	centralManagerDidDiscoverPeripheralAdvertisementDataRSSI(central: CBCentralManager, peripheral: CBPeripheral, advertisementData: NSDictionary<string, any>, RSSI: number): void;
+	centralManagerDidUpdateState(central: CBCentralManager): void;
+	initWithCentralManager(centralManager: CBCentralManager): this;
+	removeStatusListener(): void;
+	removeTappyFoundListener(): void;
+	setStatusListenerWithStatusReceived(listener: (p1: TappyBleScannerStatus) => void): void;
+	setTappyFoundListenerWithListener(listener: (p1: TappyBleDevice, p2: string) => void): void;
+	startScan(): boolean;
+	stopScan(): void;
+}
+
+export declare const enum TappyBleScannerStatus {
+	STATUS_CLOSED = 1,
+	STATUS_SCANNING = 2,
+	STATUS_POWERED_OFF = 3,
+	STATUS_POWERED_ON = 4,
+	STATUS_RESETTING = 5,
+	STATUS_NOT_AUTHORIZED = 6,
+	STATUS_NOT_SUPPORTED = 7,
+	STATUS_UNKNOWN = 8
+}
+
+export declare class TappyCentralManagerProvider extends NSObject {
+	static alloc(): TappyCentralManagerProvider; // inherited from NSObject
+	static new(): TappyCentralManagerProvider; // inherited from NSObject
+	static shared(): TappyCentralManagerProvider;
+	centralManager: CBCentralManager;
+}
+
+export declare interface TappySerialCommunicator {
+	state: TappyStatus;
+	close(): void;
+	connect(): void;
+	disconnect(): void;
+	getDeviceDescription(): string;
+	removeDataListener(): void;
+	removeStatusListener(): void;
+	sendBytesWithData(data: NSArray<number>): void;
+	setDataListenerWithReceivedBytes(listener: (p1: NSArray<number>) => void): void;
+	setStatusListenerWithStatusReceived(listener: (p1: TappyStatus) => void): void;
+}
+export declare var TappySerialCommunicator: {
+	prototype: TappySerialCommunicator;
+};
+
+export declare const enum TappyStatus {
+	STATUS_DISCONNECTED = 1,
+	STATUS_CONNECTING = 2,
+	STATUS_READY = 3,
+	STATUS_DISCONNECTING = 4,
+	STATUS_CLOSED = 5,
+	STATUS_ERROR = 6,
+	STATUS_NOT_READY_TO_CONNECT = 7,
+	STATUS_COMMUNICATOR_ERROR = 8
+}
+
+export declare class WriteNDEFTextCommand extends NSObject implements TCMPMessage {
+	static alloc(): WriteNDEFTextCommand; // inherited from NSObject
+	static new(): WriteNDEFTextCommand; // inherited from NSObject
+	public lockFlag: LockingMode;
+	public text: NSArray<number>;
+	public timeout: number;
+	public commandCode: number; // inherited from TCMPMessage
+	public commandFamily: NSArray<number>; // inherited from TCMPMessage
+	public payload: NSArray<number>; // inherited from TCMPMessage
+	constructor(o: { timeout: number; lockTag: LockingMode; text: string; });
+	initWithTimeoutLockTagText(timeout: number, lockTag: LockingMode, text: string): this;
 	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
+
 
 
 export class Tappy extends Common {
@@ -218,18 +337,16 @@ export class Tappy extends Common {
     private tappyCentralManager: CBCentralManager;
     private tappyBle: TappyBle;
     private connectedStatus = TappyStatus.STATUS_DISCONNECTED;
-    private readWristbandCommand : StreamNDEFCommand = new StreamNDEFCommand();
+    private timeout = 0;
+    private readWristbandCommand : StreamNDEFCommand = new StreamNDEFCommand({timeout: 0, pollingMode: PollingMode.PollForGeneral});
+	private stopCommand : StopCommand = new StopCommand();
 
 
     constructor() {
         super();
-        console.log("Initializing tappy ios");
         this.tappyCentralManager = TappyCentralManagerProvider.shared().centralManager;
-        this.scanner = new TappyBleScanner(this.tappyCentralManager);
-        console.log("Setting listeners");
+        this.scanner = new TappyBleScanner( {centralManager: this.tappyCentralManager });
         this.scanner.setStatusListenerWithStatusReceived( ( status: TappyBleScannerStatus ) => {
-            console.log("Status changed TappyBle:");
-            console.log(status);
             this.status = status;
             // need to throw this
             const statusUpdatedEvent = {
@@ -240,22 +357,8 @@ export class Tappy extends Common {
             this.notify(statusUpdatedEvent);
         });
 
-        // this.scanner.setTappyFoundListenerWithListener( );
-
-        this.scanner.setTappyFoundListenerWithListener( (tappyDevice, name) => {
-            console.log("Found tappy [any]:");
-            console.log(JSON.stringify(tappyDevice));
-            console.log("Name:", name);
+        this.scanner.setTappyFoundListenerWithListener( (tappyDevice: TappyBleDevice, name: string) => {
             try {
-                // console.dir(tappyDevice);
-                // console.log("Attempting to loop through keys");
-                // for (var key in tappyDevice) {
-                //     console.log("key:", key);
-                //     // console.log("value:");
-                //     // console.dir(tappyDevice[key]);
-                // }
-                // console.log("Post loop through keys");
-
                 this.device = tappyDevice;
                 this.device.deviceName = name;
                 const tappyFoundEvent = {
@@ -263,9 +366,7 @@ export class Tappy extends Common {
                     object: this,
                     device: this.device
                 };
-                console.log("notifying");
                 this.notify(tappyFoundEvent);
-                console.log("post notify");
             } catch( err ) {
                 console.log("err:");
                 console.log(JSON.stringify(err));
@@ -277,126 +378,112 @@ export class Tappy extends Common {
 
     public connect() {
         let tappyBle = TappyBle.getTappyBleWithCentralManagerDevice(this.tappyCentralManager, this.device);
-        console.log("TappyBle:");
-        console.log(JSON.stringify(tappyBle));
         if (tappyBle) {
-            console.log("Can proceed to connect");
             this.tappyBle = tappyBle;
             let currentStatus = this.tappyBle.getLatestStatus();
-            console.log("setting status listener...");
-            console.log("currentStatus:", currentStatus);
             this.tappyBle.setStatusListenerWithListner( (status: TappyStatus) => {
                 const tappyStatusUpdatedEvent = {
                     eventName: "tappyStatusUpdated",
                     object: this,
                     status: status
                 };
-                console.log("notifying:", status);
                 this.notify(tappyStatusUpdatedEvent);
             });
-            console.log("attempting to connect");
-            let isConnected = this.tappyBle.connect();
-            // undefined - we need the status listener to tell when / if it connects
-            console.log("Is connected:", isConnected);
+            this.tappyBle.connect();
         }
     }
 
 
 
     public setResponseListener() {
-        console.log("setting response listener!");
         if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
-            console.log("setting the listener");
-            this.tappyBle.setResponseListenerWithListener( (tcmpResponse: any) => {
-                console.log("Response listener");
-                console.log(JSON.stringify(tcmpResponse));
-                // now need to determine the response type
-                let type = typeof tcmpResponse; // object
-                console.log("Type is:");
-                console.log(type);
+            this.tappyBle.setResponseListenerWithListener( (tcmpResponse: any, data) => {
+				try{
+					let basicNFCResolver: BasicNFCCommandResolver = new BasicNFCCommandResolver();
+					let resolvedResponse: TCMPMessage = basicNFCResolver.resolveResponseWithMessageError(tcmpResponse);
+					// now need to determine the response type
+					let responseName = resolvedResponse.toString();
+					let dataObj = JSON.parse(data);
 
-                console.log("Dirred:");
-                console.dir(tcmpResponse);
-
-                console.log("Instanceof check:");
-                console.log("Payload:");
-                console.log(tcmpResponse.payload);
-                console.log(JSON.stringify(tcmpResponse.payload));
-                console.log("About to enter try{}catch...");
-                try {
-                    
-
-                    if (tcmpResponse instanceof BasicNfcApplicationErrorMessage || tcmpResponse.appErrorCode) {
-                        console.log("It's a BasicNfcApplicationErrorMessage!");
-                    } else if (tcmpResponse instanceof NDEFFoundResponse || tcmpResponse.ndefMessage) {
-                        console.log("It's a NDEFFoundResponse!");
-                    } else if (tcmpResponse instanceof TagWrittenResponse || tcmpResponse.payload) {
-                        console.log("It's a TagWrittenResponse!");
-                    } 
-                    else {
-                        // it is returning here 
-                        // typeof is "object"
-                        console.log("Instanceof was unhelpful");
-                    }
-                    console.log("Defining tag type");
-                    let tagType: number = TagTypes.TAG_UNKNOWN;
-                    console.log(tagType);
-                    // let array = [0x00,0x00,0x00,0x00,0x00,0x00,0x00];
-                    let tagCode: NSArray<number> = null;// NSArray.arrayWithObjects(0x00);
-                    console.log("Defined tagCode:");
-                    console.dir(tagCode);
-                    //NSArray.arrayWithArray([0x00,0x00,0x00,0x00,0x00,0x00,0x00]);
-                    let ndefMessage: NSArray<number> = null; //NSArray.arrayWithObjects(0xD0);
-                    console.log("ndefMessage:");
-                    console.dir(ndefMessage);
-                    let tagReadResponse: NDEFFoundResponse = new NDEFFoundResponse({tagCode, tagType, ndefMessage });
-                    console.log("tag read response:");
-                    console.dir(tagReadResponse);
-                    // it is crashing on below line b/c payload is null
-                    tagReadResponse.parsePayloadWithPayloadError(tcmpResponse.payload);
-                    let textRead = this.getNdefTextPayload(tagReadResponse);
-
-                } catch (err) {
-                    console.log("Caught error");
-                    console.log(JSON.stringify(err));
-                }
+					if (responseName.includes("NDEFFoundResponse")) {
+						const ndefFoundResponseEvent = {
+							eventName: "ndefFoundResponse",
+							object: this,
+							ndefData: dataObj
+						};
+						this.notify(ndefFoundResponseEvent);
+					} else if (responseName.includes("BasicNfcApplicationErrorMessage")) {
+						// notify error
+						const writtenResponseEvent = {
+							eventName: "writtenResponse",
+							object: this,
+							success: false
+						};
+						this.notify(writtenResponseEvent);
+					} else if (responseName.includes("TagWrittenResponse")) {
+						// notify success
+						const writtenResponseEvent = {
+							eventName: "writtenResponse",
+							object: this,
+							success: true
+						};
+						this.notify(writtenResponseEvent);
+					} else {
+						// unknown error
+						const writtenResponseEvent = {
+							eventName: "writtenResponse",
+							object: this,
+							success: false
+						};
+						this.notify(writtenResponseEvent);
+					}
+				} catch (err) {
+					console.log("Caught error in responseListener");
+				}
             });
         }
     }
 
 
-    public getNdefTextPayload(tagReadResponse) {
-        console.log("get NDEF Payload:");
-        console.log(JSON.stringify(tagReadResponse));
-    }
-
     public disconnect() {
-        console.log("Disconnect from tappy");
         this.tappyBle.disconnect();
     }
 
     public startScan(): boolean {
-        console.log("about to start scan");
         let res = this.scanner.startScan();
-        console.log("start scan res:");
-        console.log(res);
         return res;
     }
 
     public stopScan() {
-        console.log("Stop scan!");
         this.scanner.stopScan();
     }
 
-    public writeNDEF(text: string) {
-        let writeText: WriteNDEFTextCommand;
+    public writeNDEF(text: string, timeout = 0, lockTag = LockingMode.DONT_LOCK_TAG): Boolean {
+		if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
+        	let writeCommand : WriteNDEFTextCommand = new WriteNDEFTextCommand({timeout, lockTag, text});
+			this.tappyBle.sendMessageWithMessage(writeCommand);
+			return true;
+		} else {
+			return false;
+		}
     }
 
-    public readNDEF() {
-        console.log("read wristband command:");
-        console.log(this.readWristbandCommand);
-        console.log(JSON.stringify(this.readWristbandCommand));
-        this.tappyBle.sendMessageWithMessage(this.readWristbandCommand);
+    public readNDEF(): Boolean {
+		if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
+        	this.tappyBle.sendMessageWithMessage(this.readWristbandCommand);
+			return true;
+		} else {
+			return false;
+		}
     }
+
+	public stop(): Boolean {
+		if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
+			this.tappyBle.sendMessageWithMessage(this.stopCommand);
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 }
