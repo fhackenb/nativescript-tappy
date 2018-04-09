@@ -1,6 +1,6 @@
 # NativeScript Tappy
 
-{N} plugin for integrating with the iOS sdk for [](https://github.com/TapTrack/TCMPTappy-iOS)
+{N} plugin for integrating with the iOS sdk for [https://github.com/TapTrack/TCMPTappy-iOS]()
 
 
 ## Installation
