@@ -10,7 +10,11 @@
     <Button text="Disconnect" tap="{{ disconnectTappy }}" visibility="{{ isConnected ? 'visible' : 'collapsed' }}" style="margin-top:40px"/>
 
 
-    <Button text="Test R/W" tap="{{ testRW }}" visibility="{{ isConnected ? 'visible' : 'collapsed' }}" style="margin-top:100px"/>
+    <Button text="Read" tap="{{ read }}" visibility="{{ isConnected ? 'visible' : 'collapsed' }}" style="margin-top:100px"/>
+
+    <Button text="Write" tap="{{ write }}" visibility="{{ isConnected && !isReading ? 'visible' : 'collapsed' }}" style="margin-top:100px"/>
+
+    <Button text="Stop" tap="{{ stop }}" visibility="{{ isConnected ? 'visible' : 'collapsed' }}" style="margin-top:100px"/>
 
   </StackLayout>
 </Page>

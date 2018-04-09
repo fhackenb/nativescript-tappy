@@ -1,39 +1,17 @@
-# Your Plugin Name
+# NativeScript Tappy
 
-Add your plugin badges here. See [nativescript-urlhandler](https://github.com/hypery2k/nativescript-urlhandler) for example.
-
-Then describe what's the purpose of your plugin. 
-
-In case you develop UI plugin, this is where you can add some screenshots.
+{N} plugin for integrating with the iOS sdk for [](https://github.com/TapTrack/TCMPTappy-iOS)
 
 ## (Optional) Prerequisites / Requirements
 
 Describe the prerequisites that the user need to have installed before using your plugin. See [nativescript-firebase plugin](https://github.com/eddyverbruggen/nativescript-plugin-firebase) for example.
 
 ## Installation
+Coming soon. This plugin is not yet published
 
-Describe your plugin installation steps. Ideally it would be something like:
+## Demo
 
-```javascript
-tns plugin add <your-plugin-name>
-```
-
-## Usage 
-
-Describe any usage specifics for your plugin. Give examples for Android, iOS, Angular if needed. See [nativescript-drop-down](https://www.npmjs.com/package/nativescript-drop-down) for example.
-	
-	```javascript
-    Usage code snippets here
-    ```)
-
-## API
-
-Describe your plugin methods and properties here. See [nativescript-feedback](https://github.com/EddyVerbruggen/nativescript-feedback) for example.
-    
-| Property | Default | Description |
-| --- | --- | --- |
-| some property | property default value | property description, default values, etc.. |
-| another property | property default value | property description, default values, etc.. |
+The demo app scans for TapTrack devices, connects, and performs read and write actions
     
 ## License
 
