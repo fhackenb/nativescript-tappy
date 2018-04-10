@@ -263,6 +263,7 @@ export declare class TappyBleScanner extends NSObject {
 	removeStatusListener(): void;
 	removeTappyFoundListener(): void;
 	setStatusListenerWithStatusReceived(listener: (p1: TappyBleScannerStatus) => void): void;
+	setTappyFoundListenerJSONWithListener(listener: (p1: TappyBleDevice, p2: string) => void): void;
 	setTappyFoundListenerWithListener(listener: (p1: TappyBleDevice, p2: string) => void): void;
 	startScan(): boolean;
 	stopScan(): void;
@@ -356,19 +357,23 @@ export class Tappy extends Common {
             };
             this.notify(statusUpdatedEvent);
         });
-
-        this.scanner.setTappyFoundListenerWithListener( (tappyDevice: TappyBleDevice, name: string) => {
+		
+        this.scanner.setTappyFoundListenerJSONWithListener( (tappyDevice: TappyBleDevice, json: string) => {
             try {
                 this.device = tappyDevice;
-                this.device.deviceName = name;
-                const tappyFoundEvent = {
-                    eventName: "tappyFound",
-                    object: this,
-                    device: this.device
-                };
-                this.notify(tappyFoundEvent);
+				if (json) {
+					let data = JSON.parse(json);
+					this.device.deviceName = data.deviceName;
+					this.device.deviceId = data.deviceId;
+					const tappyFoundEvent = {
+						eventName: "tappyFound",
+						object: this,
+						device: this.device
+					};
+                	this.notify(tappyFoundEvent);	
+				}
             } catch( err ) {
-                console.log("err:");
+                console.log("tappy found err :");
                 console.log(JSON.stringify(err));
             }
         });

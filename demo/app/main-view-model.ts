@@ -58,7 +58,7 @@ export class HelloWorldModel extends Observable {
   constructor() {
     super();
 
-    console.log("Init Tappy");
+    console.log("Init Tappy!");
     this.tappy = new Tappy();
     // event listeners here
     console.log("Defining listeners now");
