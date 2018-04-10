@@ -171,6 +171,8 @@ declare class SerialTappy extends NSObject {
 
 	sendMessageWithMessage(message: TCMPMessage): void;
 
+	setResponseListenerJSONWithListener(listener: (p1: TCMPMessage, p2: string) => void): void;
+
 	setResponseListenerWithListener(listener: (p1: TCMPMessage) => void): void;
 
 	setStatusListenerWithListner(listner: (p1: TappyStatus) => void): void;

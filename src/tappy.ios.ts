@@ -106,6 +106,7 @@ export declare class SerialTappy extends NSObject {
 	removeStatusListener(): void;
 	removeUnparsablePacketListener(): void;
 	sendMessageWithMessage(message: TCMPMessage): void;
+	setResponseListenerJSONWithListener(listener: (p1: TCMPMessage, p2: string) => void): void;
 	setResponseListenerWithListener(listener: (p1: TCMPMessage, p2: any) => void): void;
 	setStatusListenerWithListner(listner: (p1: TappyStatus) => void): void;
 	setUnparsablePacketListenerWithListener(listener: (p1: NSArray<number>) => void): void;
@@ -403,7 +404,7 @@ export class Tappy extends Common {
 
     public setResponseListener() {
         if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
-            this.tappyBle.setResponseListenerWithListener( (tcmpResponse: any, data) => {
+            this.tappyBle.setResponseListenerJSONWithListener( (tcmpResponse: any, data) => {
 				try{
 					let basicNFCResolver: BasicNFCCommandResolver = new BasicNFCCommandResolver();
 					let resolvedResponse: TCMPMessage = basicNFCResolver.resolveResponseWithMessageError(tcmpResponse);
@@ -412,38 +413,20 @@ export class Tappy extends Common {
 					let dataObj = JSON.parse(data);
 
 					if (responseName.includes("NDEFFoundResponse")) {
-						console.log("Data object is:");
-						console.log(JSON.stringify(dataObj));
 						let payload = dataObj.payload;
-						console.log("payload:", payload);
 						let tagCode = NSArray.arrayWithObject(0x00);
-						//NSArray.arrayWithArray([0x00,0x00,0x00,0x00,0x00,0x00,0x00]);
-						// [0x00,0x00,0x00,0x00,0x00,0x00,0x00];
 						let tagType = TagTypes.TAG_UNKNOWN;
 						let ndefMessage = NSArray.arrayWithObject(0xD0);
-						console.log("initializing tagReadResponse");
 						let tagReadResponse : NDEFFoundResponse = new NDEFFoundResponse({tagCode, tagType, ndefMessage});
 						tagReadResponse.parsePayloadWithPayloadError(payload) //no need to handle exception here since the resolver would not have returned otherwise
-                        console.log("!Post tagReadResponse...");
-						// now need to parse the payload ...
+						// now need to parse the payload
 						try {
-							console.log("Inner try{}catch");
 							let ndefDataString = basicNFCResolver.getNdefTextPayloadJSONWithNdefResponse(tagReadResponse);
-							console.log("Got ndef data:");
-							console.log(ndefDataString);
 							if (ndefDataString) {
-								console.log("Data object before");
-								console.log(JSON.stringify(dataObj));
 								let ndefData = JSON.parse(ndefDataString);
-								dataObj.ndefText = ndefData.ndefText;
+								dataObj.ndefText = ndefData.ndef.slice(6, ndefData.ndef.length);
 								dataObj.tagCode = ndefData.tagCode;
 								
-								console.log("Let's get the tag code now...");
-								// console.dir(tagReadResponse.tagCode);
-
-								console.log("Data object now:");
-								console.log(JSON.stringify(dataObj));
-
 								const ndefFoundResponseEvent = {
 									eventName: "ndefFoundResponse",
 									object: this,

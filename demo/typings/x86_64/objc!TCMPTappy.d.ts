@@ -7,6 +7,8 @@ declare class BasicNFCCommandResolver extends NSObject {
 
 	readonly FAMILY_ID: NSArray<number>;
 
+	getNdefTextPayloadJSONWithNdefResponse(ndefResponse: NDEFFoundResponse): string;
+
 	resolveCommandWithMessageError(message: TCMPMessage): TCMPMessage;
 
 	resolveResponseWithMessageError(message: TCMPMessage): TCMPMessage;
@@ -168,6 +170,8 @@ declare class SerialTappy extends NSObject {
 	removeUnparsablePacketListener(): void;
 
 	sendMessageWithMessage(message: TCMPMessage): void;
+
+	setResponseListenerJSONWithListener(listener: (p1: TCMPMessage, p2: string) => void): void;
 
 	setResponseListenerWithListener(listener: (p1: TCMPMessage) => void): void;
 
