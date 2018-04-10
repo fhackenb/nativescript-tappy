@@ -12,6 +12,7 @@ export declare class BasicNFCCommandResolver extends NSObject {
 	public FAMILY_ID: NSArray<number>;
 	resolveCommandWithMessageError(message: TCMPMessage): TCMPMessage;
 	resolveResponseWithMessageError(message: TCMPMessage): TCMPMessage;
+	getNdefTextPayloadJSONWithNdefResponse(ndefResponse: NDEFFoundResponse): string;
 }
 
 export declare class BasicNfcApplicationErrorMessage extends NSObject implements TCMPMessage {
@@ -411,12 +412,49 @@ export class Tappy extends Common {
 					let dataObj = JSON.parse(data);
 
 					if (responseName.includes("NDEFFoundResponse")) {
-						const ndefFoundResponseEvent = {
-							eventName: "ndefFoundResponse",
-							object: this,
-							ndefData: dataObj
-						};
-						this.notify(ndefFoundResponseEvent);
+						console.log("Data object is:");
+						console.log(JSON.stringify(dataObj));
+						let payload = dataObj.payload;
+						console.log("payload:", payload);
+						let tagCode = NSArray.arrayWithObject(0x00);
+						//NSArray.arrayWithArray([0x00,0x00,0x00,0x00,0x00,0x00,0x00]);
+						// [0x00,0x00,0x00,0x00,0x00,0x00,0x00];
+						let tagType = TagTypes.TAG_UNKNOWN;
+						let ndefMessage = NSArray.arrayWithObject(0xD0);
+						console.log("initializing tagReadResponse");
+						let tagReadResponse : NDEFFoundResponse = new NDEFFoundResponse({tagCode, tagType, ndefMessage});
+						tagReadResponse.parsePayloadWithPayloadError(payload) //no need to handle exception here since the resolver would not have returned otherwise
+                        console.log("!Post tagReadResponse...");
+						// now need to parse the payload ...
+						try {
+							console.log("Inner try{}catch");
+							let ndefDataString = basicNFCResolver.getNdefTextPayloadJSONWithNdefResponse(tagReadResponse);
+							console.log("Got ndef data:");
+							console.log(ndefDataString);
+							if (ndefDataString) {
+								console.log("Data object before");
+								console.log(JSON.stringify(dataObj));
+								let ndefData = JSON.parse(ndefDataString);
+								dataObj.ndefText = ndefData.ndefText;
+								dataObj.tagCode = ndefData.tagCode;
+								
+								console.log("Let's get the tag code now...");
+								// console.dir(tagReadResponse.tagCode);
+
+								console.log("Data object now:");
+								console.log(JSON.stringify(dataObj));
+
+								const ndefFoundResponseEvent = {
+									eventName: "ndefFoundResponse",
+									object: this,
+									ndefData: dataObj
+								};
+								this.notify(ndefFoundResponseEvent);
+							}
+						} catch (err) {
+							console.log("NDEF data string error...");
+							console.log(err);
+						}
 					} else if (responseName.includes("BasicNfcApplicationErrorMessage")) {
 						// notify error
 						const writtenResponseEvent = {
@@ -444,6 +482,8 @@ export class Tappy extends Common {
 					}
 				} catch (err) {
 					console.log("Caught error in responseListener");
+					console.log(JSON.stringify(err));
+					console.log(err);
 				}
             });
         }
