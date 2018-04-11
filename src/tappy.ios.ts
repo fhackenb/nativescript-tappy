@@ -330,6 +330,7 @@ export declare class WriteNDEFTextCommand extends NSObject implements TCMPMessag
 	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
 
+const NDEF = require('@taptrack/ndef');
 
 
 export class Tappy extends Common {
@@ -414,19 +415,16 @@ export class Tappy extends Common {
 
 					if (responseName.includes("NDEFFoundResponse")) {
 						let payload = dataObj.payload;
-						let tagCode = NSArray.arrayWithObject(0x00);
-						let tagType = TagTypes.TAG_UNKNOWN;
-						let ndefMessage = NSArray.arrayWithObject(0xD0);
-						let tagReadResponse : NDEFFoundResponse = new NDEFFoundResponse({tagCode, tagType, ndefMessage});
-						tagReadResponse.parsePayloadWithPayloadError(payload) //no need to handle exception here since the resolver would not have returned otherwise
 						// now need to parse the payload
 						try {
-							let ndefDataString = basicNFCResolver.getNdefTextPayloadJSONWithNdefResponse(tagReadResponse);
-							if (ndefDataString) {
-								let ndefData = JSON.parse(ndefDataString);
-								dataObj.ndefText = ndefData.ndef.slice(6, ndefData.ndef.length);
-								dataObj.tagCode = ndefData.tagCode;
-								
+							let bytesArray = payload.slice(9, payload.length);
+							let tagCode = payload.slice(2,9);
+							var message = NDEF.Message.fromBytes(bytesArray);
+							var records = message.getRecords();
+							var recordContents = NDEF.Utils.resolveTextRecord(records[0]);
+							if (recordContents.content) {
+								dataObj.ndefText = recordContents.content;
+								dataObj.tagCode = tagCode;
 								const ndefFoundResponseEvent = {
 									eventName: "ndefFoundResponse",
 									object: this,

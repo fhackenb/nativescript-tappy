@@ -181,7 +181,7 @@ export class HelloWorldModel extends Observable {
 
   write() {
     console.log("Do Write long url");
-    let text = "https://www.rapidtables.com/convert/number/decimal-to-hex.html";
+    let text = "https://www.rapidtables.com/convert/number/decimal-to-hex.html/frankrox";
     // let text = "aosdksaod,sa19292msakdheendishere!";
     //"70cbe99a-3764-11e8-b467-0ed5f89f718b";
     this.message = "Writing text " + text + " ...";
