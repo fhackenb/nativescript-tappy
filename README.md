@@ -8,10 +8,10 @@
 The demo app scans for TapTrack devices, connects, and performs read and write actions.
 To run the demo:
 
-cd demo . 
-npm install . 
-tns platform add ios . 
-tns run ios . 
+cd demo <br />
+npm install <br />
+tns platform add ios <br /> 
+tns run ios <br />
     
 ## License
 
