@@ -3,12 +3,15 @@
 {N} plugin for integrating with the iOS sdk for [https://github.com/TapTrack/TCMPTappy-iOS]()
 
 
-## Installation
-Coming soon. This plugin is not yet published
-
 ## Demo
 
-The demo app scans for TapTrack devices, connects, and performs read and write actions
+The demo app scans for TapTrack devices, connects, and performs read and write actions.
+To run the demo:
+
+*cd into demo
+*npm install
+*tns platform add ios
+*tns run ios
     
 ## License
 
