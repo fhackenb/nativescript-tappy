@@ -5,6 +5,7 @@ export declare class BasicNFCCommandResolver extends NSObject {
     FAMILY_ID: NSArray<number>;
     resolveCommandWithMessageError(message: TCMPMessage): TCMPMessage;
     resolveResponseWithMessageError(message: TCMPMessage): TCMPMessage;
+    getNdefTextPayloadJSONWithNdefResponse(ndefResponse: NDEFFoundResponse): string;
 }
 export declare class BasicNfcApplicationErrorMessage extends NSObject implements TCMPMessage {
     static alloc(): BasicNfcApplicationErrorMessage;
@@ -90,6 +91,38 @@ export declare class ScanNDEFCommand extends NSObject implements TCMPMessage {
     initWithTimeoutPollingMode(timeout: number, pollingMode: PollingMode): this;
     parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
+export declare class ScanTagCommand extends NSObject implements TCMPMessage {
+    static alloc(): ScanTagCommand;
+    static getCommandCode(): number;
+    static new(): ScanTagCommand;
+    pollingMode: PollingMode;
+    timeout: number;
+    commandCode: number;
+    commandFamily: NSArray<number>;
+    payload: NSArray<number>;
+    constructor(o: {
+        timeout: number;
+        pollingMode: PollingMode;
+    });
+    initWithTimeoutPollingMode(timeout: number, pollingMode: PollingMode): this;
+    parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
+}
+export declare class StreamTagCommand extends NSObject implements TCMPMessage {
+    static alloc(): StreamTagCommand;
+    static getCommandCode(): number;
+    static new(): StreamTagCommand;
+    pollingMode: PollingMode;
+    timeout: number;
+    commandCode: number;
+    commandFamily: NSArray<number>;
+    payload: NSArray<number>;
+    constructor(o: {
+        timeout: number;
+        pollingMode: PollingMode;
+    });
+    initWithTimeoutPollingMode(timeout: number, pollingMode: PollingMode): this;
+    parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
+}
 export declare class SerialTappy extends NSObject {
     static alloc(): SerialTappy;
     static new(): SerialTappy;
@@ -109,6 +142,7 @@ export declare class SerialTappy extends NSObject {
     removeStatusListener(): void;
     removeUnparsablePacketListener(): void;
     sendMessageWithMessage(message: TCMPMessage): void;
+    setResponseListenerJSONWithListener(listener: (p1: TCMPMessage, p2: string) => void): void;
     setResponseListenerWithListener(listener: (p1: TCMPMessage, p2: any) => void): void;
     setStatusListenerWithListner(listner: (p1: TappyStatus) => void): void;
     setUnparsablePacketListenerWithListener(listener: (p1: NSArray<number>) => void): void;
@@ -261,6 +295,7 @@ export declare class TappyBleScanner extends NSObject {
     removeStatusListener(): void;
     removeTappyFoundListener(): void;
     setStatusListenerWithStatusReceived(listener: (p1: TappyBleScannerStatus) => void): void;
+    setTappyFoundListenerJSONWithListener(listener: (p1: TappyBleDevice, p2: string) => void): void;
     setTappyFoundListenerWithListener(listener: (p1: TappyBleDevice, p2: string) => void): void;
     startScan(): boolean;
     stopScan(): void;
@@ -332,6 +367,8 @@ export declare class Tappy extends Common {
     private connectedStatus;
     private timeout;
     private readWristbandCommand;
+    private scanTagCommand;
+    private streamTagCommand;
     private stopCommand;
     constructor();
     connect(): void;
@@ -342,4 +379,6 @@ export declare class Tappy extends Common {
     writeNDEF(text: string, timeout?: number, lockTag?: LockingMode): Boolean;
     readNDEF(): Boolean;
     stop(): Boolean;
+    scanTag(): Boolean;
+    streamTag(): boolean;
 }

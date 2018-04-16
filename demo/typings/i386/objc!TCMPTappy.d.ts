@@ -7,8 +7,6 @@ declare class BasicNFCCommandResolver extends NSObject {
 
 	readonly FAMILY_ID: NSArray<number>;
 
-	getNdefTextPayloadJSONWithNdefResponse(ndefResponse: NDEFFoundResponse): string;
-
 	resolveCommandWithMessageError(message: TCMPMessage): TCMPMessage;
 
 	resolveResponseWithMessageError(message: TCMPMessage): TCMPMessage;
@@ -141,6 +139,31 @@ declare class ScanNDEFCommand extends NSObject implements TCMPMessage {
 	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
 
+declare class ScanTagCommand extends NSObject implements TCMPMessage {
+
+	static alloc(): ScanTagCommand; // inherited from NSObject
+
+	static getCommandCode(): number;
+
+	static new(): ScanTagCommand; // inherited from NSObject
+
+	readonly pollingMode: PollingMode;
+
+	readonly timeout: number;
+
+	readonly commandCode: number; // inherited from TCMPMessage
+
+	readonly commandFamily: NSArray<number>; // inherited from TCMPMessage
+
+	readonly payload: NSArray<number>; // inherited from TCMPMessage
+
+	constructor(o: { timeout: number; pollingMode: PollingMode; });
+
+	initWithTimeoutPollingMode(timeout: number, pollingMode: PollingMode): this;
+
+	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
+}
+
 declare class SerialTappy extends NSObject {
 
 	static alloc(): SerialTappy; // inherited from NSObject
@@ -222,6 +245,31 @@ declare class StreamNDEFCommand extends NSObject implements TCMPMessage {
 	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
 
+declare class StreamTagCommand extends NSObject implements TCMPMessage {
+
+	static alloc(): StreamTagCommand; // inherited from NSObject
+
+	static getCommandCode(): number;
+
+	static new(): StreamTagCommand; // inherited from NSObject
+
+	readonly pollingMode: PollingMode;
+
+	readonly timeout: number;
+
+	readonly commandCode: number; // inherited from TCMPMessage
+
+	readonly commandFamily: NSArray<number>; // inherited from TCMPMessage
+
+	readonly payload: NSArray<number>; // inherited from TCMPMessage
+
+	constructor(o: { timeout: number; pollingMode: PollingMode; });
+
+	initWithTimeoutPollingMode(timeout: number, pollingMode: PollingMode): this;
+
+	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
+}
+
 declare class TCMP extends NSObject {
 
 	static alloc(): TCMP; // inherited from NSObject
@@ -261,6 +309,25 @@ declare class TCMPUtils extends NSObject {
 	static hdlcEncodePacketWithPacket(packet: NSArray<number>): NSArray<number>;
 
 	static new(): TCMPUtils; // inherited from NSObject
+}
+
+declare class TagFoundResponse extends NSObject implements TCMPMessage {
+
+	static alloc(): TagFoundResponse; // inherited from NSObject
+
+	static new(): TagFoundResponse; // inherited from NSObject
+
+	readonly tagCode: NSArray<number>;
+
+	readonly tagType: TagTypes;
+
+	readonly commandCode: number; // inherited from TCMPMessage
+
+	readonly commandFamily: NSArray<number>; // inherited from TCMPMessage
+
+	readonly payload: NSArray<number>; // inherited from TCMPMessage
+
+	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
 
 declare const enum TagTypes {

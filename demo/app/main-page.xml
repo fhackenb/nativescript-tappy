@@ -14,6 +14,10 @@
 
     <Button text="Write" tap="{{ write }}" visibility="{{ isConnected && !isReading ? 'visible' : 'collapsed' }}" style="margin-top:100px"/>
 
+    <Button text="Scan Tag" tap="{{ scanTag }}" visibility="{{ isConnected && !isReading ? 'visible' : 'collapsed' }}" style="margin-top:100px"/>
+
+    <Button text="Stream Tag" tap="{{ streamTag }}" visibility="{{ isConnected && !isReading ? 'visible' : 'collapsed' }}" style="margin-top:100px"/>
+
     <Button text="Stop" tap="{{ stop }}" visibility="{{ isConnected ? 'visible' : 'collapsed' }}" style="margin-top:100px"/>
 
   </StackLayout>

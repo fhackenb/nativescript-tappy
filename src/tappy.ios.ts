@@ -89,6 +89,34 @@ export declare class ScanNDEFCommand extends NSObject implements TCMPMessage {
 	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
 }
 
+export declare class ScanTagCommand extends NSObject implements TCMPMessage {
+	static alloc(): ScanTagCommand; // inherited from NSObject
+	static getCommandCode(): number;
+	static new(): ScanTagCommand; // inherited from NSObject
+	public pollingMode: PollingMode;
+	public timeout: number;
+	public commandCode: number; // inherited from TCMPMessage
+	public commandFamily: NSArray<number>; // inherited from TCMPMessage
+	public payload: NSArray<number>; // inherited from TCMPMessage
+	constructor(o: { timeout: number; pollingMode: PollingMode; });
+	initWithTimeoutPollingMode(timeout: number, pollingMode: PollingMode): this;
+	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
+}
+
+export declare class StreamTagCommand extends NSObject implements TCMPMessage {
+	static alloc(): StreamTagCommand; // inherited from NSObject
+	static getCommandCode(): number;
+	static new(): StreamTagCommand; // inherited from NSObject
+	public pollingMode: PollingMode;
+	public timeout: number;
+	public commandCode: number; // inherited from TCMPMessage
+	public commandFamily: NSArray<number>; // inherited from TCMPMessage
+	public payload: NSArray<number>; // inherited from TCMPMessage
+	constructor(o: { timeout: number; pollingMode: PollingMode; });
+	initWithTimeoutPollingMode(timeout: number, pollingMode: PollingMode): this;
+	parsePayloadWithPayloadError(payload: NSArray<number>): boolean;
+}
+
 export declare class SerialTappy extends NSObject {
 	static alloc(): SerialTappy; // inherited from NSObject
 	static new(): SerialTappy; // inherited from NSObject
@@ -343,6 +371,8 @@ export class Tappy extends Common {
     private connectedStatus = TappyStatus.STATUS_DISCONNECTED;
     private timeout = 0;
     private readWristbandCommand : StreamNDEFCommand = new StreamNDEFCommand({timeout: 0, pollingMode: PollingMode.PollForGeneral});
+	private scanTagCommand : ScanTagCommand = new ScanTagCommand({timeout: 0, pollingMode: PollingMode.PollForGeneral});
+	private streamTagCommand: StreamTagCommand = new StreamTagCommand({timeout: 0, pollingMode: PollingMode.PollForGeneral});
 	private stopCommand : StopCommand = new StopCommand();
 
 
@@ -412,26 +442,36 @@ export class Tappy extends Common {
 					// now need to determine the response type
 					let responseName = resolvedResponse.toString();
 					let dataObj = JSON.parse(data);
-
-					if (responseName.includes("NDEFFoundResponse")) {
+					console.log("Got a response");
+					console.log(data);
+					console.log(responseName);
+					if (responseName.includes("NDEFFoundResponse") || responseName.includes("TagFoundResponse")) {
 						let payload = dataObj.payload;
 						// now need to parse the payload
 						try {
-							let bytesArray = payload.slice(9, payload.length);
-							let tagCode = payload.slice(2,9);
-							var message = NDEF.Message.fromBytes(bytesArray);
-							var records = message.getRecords();
-							var recordContents = NDEF.Utils.resolveTextRecord(records[0]);
-							if (recordContents.content) {
-								dataObj.ndefText = recordContents.content;
-								dataObj.tagCode = tagCode;
-								const ndefFoundResponseEvent = {
-									eventName: "ndefFoundResponse",
-									object: this,
-									ndefData: dataObj
-								};
-								this.notify(ndefFoundResponseEvent);
+							let tagCode;
+							if (responseName.includes("NDEFFoundResponse")) {
+								let bytesArray = payload.slice(9, payload.length);
+								tagCode = payload.slice(2,9);
+								var message = NDEF.Message.fromBytes(bytesArray);
+								var records = message.getRecords();
+								var recordContents = NDEF.Utils.resolveTextRecord(records[0]);
+								if (recordContents.content) {
+									dataObj.ndefText = recordContents.content;
+								}
+							} else {
+								tagCode = payload.slice(1, payload.length);
 							}
+							if (tagCode) {
+								dataObj.tagCode = this.tagToHexString(tagCode);
+							}
+							console.log("!!tagCode ~~~:", dataObj.tagCode);
+							const ndefFoundResponseEvent = {
+								eventName: "ndefFoundResponse",
+								object: this,
+								ndefData: dataObj
+							};
+							this.notify(ndefFoundResponseEvent);
 						} catch (err) {
 							console.log("NDEF data string error...");
 							console.log(err);
@@ -510,6 +550,32 @@ export class Tappy extends Common {
 		} else {
 			return false;
 		}
+	}
+
+	public scanTag(): Boolean {
+		if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
+			this.tappyBle.sendMessageWithMessage(this.scanTagCommand);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public streamTag() {
+		if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
+			this.tappyBle.sendMessageWithMessage(this.streamTagCommand);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private tagToHexString(tagCode: number[]): string {
+		let hexString = "";
+		tagCode.forEach( code => {
+			hexString += code.toString(16);
+		});
+		return hexString;
 	}
 
 }

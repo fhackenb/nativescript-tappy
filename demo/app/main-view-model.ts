@@ -173,6 +173,14 @@ export class HelloWorldModel extends Observable {
     this.tappy.readNDEF();
   }
 
+  scanTag() {
+    this.tappy.scanTag();
+  }
+
+  streamTag() {
+    this.tappy.streamTag();
+  }
+
   stop() {
     console.log("Stopping now ~~~~~~~~ ");
     this.tappy.stop();
@@ -187,6 +195,5 @@ export class HelloWorldModel extends Observable {
     this.message = "Writing text " + text + " ...";
     this.tappy.writeNDEF(text);
   }
-
 
 }
