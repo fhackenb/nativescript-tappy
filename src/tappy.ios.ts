@@ -415,25 +415,30 @@ export class Tappy extends Common {
     }
 
     public connect() {
-        let tappyBle = TappyBle.getTappyBleWithCentralManagerDevice(this.tappyCentralManager, this.device);
-        if (tappyBle) {
-            this.tappyBle = tappyBle;
-            let currentStatus = this.tappyBle.getLatestStatus();
-            this.tappyBle.setStatusListenerWithListner( (status: TappyStatus) => {
-                const tappyStatusUpdatedEvent = {
-                    eventName: "tappyStatusUpdated",
-                    object: this,
-                    status: status
-                };
-                this.notify(tappyStatusUpdatedEvent);
-            });
-            this.tappyBle.connect();
-        }
+		try {
+			let tappyBle = TappyBle.getTappyBleWithCentralManagerDevice(this.tappyCentralManager, this.device);
+			if (tappyBle) {
+				this.tappyBle = tappyBle;
+				let currentStatus = this.tappyBle.getLatestStatus();
+				this.tappyBle.setStatusListenerWithListner( (status: TappyStatus) => {
+					const tappyStatusUpdatedEvent = {
+						eventName: "tappyStatusUpdated",
+						object: this,
+						status: status
+					};
+					this.notify(tappyStatusUpdatedEvent);
+				});
+				this.tappyBle.connect();
+			}
+		} catch (err) {
+			console.log("Caught err connecting:", err);
+		}
     }
 
 
 
     public setResponseListener() {
+		try {
         if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
             this.tappyBle.setResponseListenerJSONWithListener( (tcmpResponse: any, data) => {
 				try{
@@ -507,12 +512,19 @@ export class Tappy extends Common {
 					console.log(err);
 				}
             });
-        }
+		}
+		} catch (err) {
+			console.log("Tappy error", err);
+		}
     }
 
 
     public disconnect() {
-        this.tappyBle.disconnect();
+		try {
+			this.tappyBle.disconnect();
+		} catch (err) {
+			console.log("Tappy error:", err);
+		}
     }
 
     public startScan(): boolean {
@@ -525,48 +537,68 @@ export class Tappy extends Common {
     }
 
     public writeNDEF(text: string, timeout = 0, lockTag = LockingMode.DONT_LOCK_TAG): Boolean {
-		if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
-        	let writeCommand : WriteNDEFTextCommand = new WriteNDEFTextCommand({timeout, lockTag, text});
-			this.tappyBle.sendMessageWithMessage(writeCommand);
-			return true;
-		} else {
-			return false;
+		try {
+			if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
+				let writeCommand : WriteNDEFTextCommand = new WriteNDEFTextCommand({timeout, lockTag, text});
+				this.tappyBle.sendMessageWithMessage(writeCommand);
+				return true;
+			} else {
+				return false;
+			}
+		} catch (err) {
+			console.log("Tappy error:", err);
 		}
     }
 
     public readNDEF(): Boolean {
-		if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
-        	this.tappyBle.sendMessageWithMessage(this.readWristbandCommand);
-			return true;
-		} else {
-			return false;
+		try {
+			if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
+				this.tappyBle.sendMessageWithMessage(this.readWristbandCommand);
+				return true;
+			} else {
+				return false;
+			}
+		} catch (err) {
+			console.log("Tappy err:", err);
 		}
     }
 
 	public stop(): Boolean {
-		if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
-			this.tappyBle.sendMessageWithMessage(this.stopCommand);
-			return true;
-		} else {
-			return false;
+		try {
+			if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
+				this.tappyBle.sendMessageWithMessage(this.stopCommand);
+				return true;
+			} else {
+				return false;
+			}
+		} catch (err) {
+			console.log("Tappy err:", err);
 		}
 	}
 
 	public scanTag(): Boolean {
-		if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
-			this.tappyBle.sendMessageWithMessage(this.scanTagCommand);
-			return true;
-		} else {
-			return false;
+		try {
+			if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
+				this.tappyBle.sendMessageWithMessage(this.scanTagCommand);
+				return true;
+			} else {
+				return false;
+			}
+		} catch (err) {
+			console.log("Tappy err:", err);
 		}
 	}
 
 	public streamTag() {
-		if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
-			this.tappyBle.sendMessageWithMessage(this.streamTagCommand);
-			return true;
-		} else {
-			return false;
+		try {
+			if (this.tappyBle.getLatestStatus() === TappyStatus.STATUS_READY) {
+				this.tappyBle.sendMessageWithMessage(this.streamTagCommand);
+				return true;
+			} else {
+				return false;
+			}
+		} catch (err) {
+			console.log("Tappy err:", err);
 		}
 	}
 

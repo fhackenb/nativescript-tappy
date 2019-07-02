@@ -1,6 +1,6 @@
 {
     "name": "nativescript-tappy",
-    "version": "1.0.0",
+    "version": "1.0.7",
     "description": "Your awesome NativeScript plugin.",
     "main": "tappy",
     "typings": "index.d.ts",
