@@ -414,9 +414,13 @@ export class Tappy extends Common {
 
     }
 
-    public connect() {
+    public connect(device) {
 		try {
-			let tappyBle = TappyBle.getTappyBleWithCentralManagerDevice(this.tappyCentralManager, this.device);
+			if (device === void 0) { device = null; }
+			if (!device) {
+				device = this.device;
+			}
+			let tappyBle = TappyBle.getTappyBleWithCentralManagerDevice(this.tappyCentralManager, device);
 			if (tappyBle) {
 				this.tappyBle = tappyBle;
 				let currentStatus = this.tappyBle.getLatestStatus();
@@ -444,12 +448,8 @@ export class Tappy extends Common {
 				try{
 					let basicNFCResolver: BasicNFCCommandResolver = new BasicNFCCommandResolver();
 					let resolvedResponse: TCMPMessage = basicNFCResolver.resolveResponseWithMessageError(tcmpResponse);
-					// now need to determine the response type
 					let responseName = resolvedResponse.toString();
 					let dataObj = JSON.parse(data);
-					console.log("Got a response");
-					console.log(data);
-					console.log(responseName);
 					if (responseName.includes("NDEFFoundResponse") || responseName.includes("TagFoundResponse")) {
 						let payload = dataObj.payload;
 						// now need to parse the payload
@@ -470,7 +470,6 @@ export class Tappy extends Common {
 							if (tagCode) {
 								dataObj.tagCode = this.tagToHexString(tagCode);
 							}
-							console.log("!!tagCode ~~~:", dataObj.tagCode);
 							const ndefFoundResponseEvent = {
 								eventName: "ndefFoundResponse",
 								object: this,
@@ -478,7 +477,7 @@ export class Tappy extends Common {
 							};
 							this.notify(ndefFoundResponseEvent);
 						} catch (err) {
-							console.log("NDEF data string error...");
+							console.log("NDEF data string error:");
 							console.log(err);
 						}
 					} else if (responseName.includes("BasicNfcApplicationErrorMessage")) {
@@ -528,12 +527,21 @@ export class Tappy extends Common {
     }
 
     public startScan(): boolean {
-        let res = this.scanner.startScan();
-        return res;
+		try {
+			let res = this.scanner.startScan();
+			return res;
+		} catch (err) {
+			console.log("Tappy err:", err);
+			return false;
+		}
     }
 
     public stopScan() {
-        this.scanner.stopScan();
+		try {
+			this.scanner.stopScan();
+		} catch (err) {
+			console.log("Stop scan err:", err);
+		}
     }
 
     public writeNDEF(text: string, timeout = 0, lockTag = LockingMode.DONT_LOCK_TAG): Boolean {
@@ -547,6 +555,7 @@ export class Tappy extends Common {
 			}
 		} catch (err) {
 			console.log("Tappy error:", err);
+			return false;
 		}
     }
 
@@ -560,6 +569,7 @@ export class Tappy extends Common {
 			}
 		} catch (err) {
 			console.log("Tappy err:", err);
+			return false;
 		}
     }
 
@@ -573,6 +583,7 @@ export class Tappy extends Common {
 			}
 		} catch (err) {
 			console.log("Tappy err:", err);
+			return false;
 		}
 	}
 
@@ -586,6 +597,7 @@ export class Tappy extends Common {
 			}
 		} catch (err) {
 			console.log("Tappy err:", err);
+			return false;
 		}
 	}
 
@@ -599,6 +611,7 @@ export class Tappy extends Common {
 			}
 		} catch (err) {
 			console.log("Tappy err:", err);
+			return false;
 		}
 	}
 
